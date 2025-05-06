@@ -1,36 +1,37 @@
-function validarCedula() {
-    const cedula = document.getElementById("cedula").value;
-    const resultado = document.getElementById("resultado");
-  
-    if (cedula.length !== 10 || isNaN(cedula)) {
-      resultado.textContent = "Cédula inválida: debe tener 10 dígitos numéricos.";
-      return;
+function validarCedula(cedula) {
+  // Validar que la cédula tenga exactamente 10 dígitos
+  if (cedula.length !== 10) return false;
+
+  // Convertir la cadena en un array de números
+  const digitos = cedula.split('').map(Number);
+
+  // Extraer el último dígito, que es el dígito verificador
+  const digitoVerificador = digitos.pop();
+
+  let suma = 0;
+
+  // Recorrer los primeros 9 dígitos
+  for (let i = 0; i < digitos.length; i++) {
+    let valor = digitos[i];
+
+    // Si la posición es par (0, 2, 4, ...), multiplicar por 2
+    if (i % 2 === 0) {
+      valor *= 2;
+
+      // Si el resultado es mayor que 9, restar 9
+      if (valor > 9) valor -= 9;
     }
-  
-    const digitos = cedula.split("").map(Number);
-    const provincia = parseInt(cedula.substring(0, 2));
-    const tercerDigito = digitos[2];
-  
-    if (provincia < 1 || provincia > 24 || tercerDigito > 6) {
-      resultado.textContent = "Cédula inválida: código de provincia o tercer dígito incorrecto.";
-      return;
-    }
-  
-    let suma = 0;
-    for (let i = 0; i < 9; i++) {
-      let valor = digitos[i];
-      if (i % 2 === 0) {
-        valor *= 2;
-        if (valor > 9) valor -= 9;
-      }
-      suma += valor;
-    }
-  
-    const verificador = (10 - (suma % 10)) % 10;
-    if (verificador === digitos[9]) {
-      resultado.textContent = "✅ Cédula válida";
-    } else {
-      resultado.textContent = "❌ Cédula inválida";
-    }
+
+    // Acumular la suma total
+    suma += valor;
   }
-  
+
+  // Obtener el residuo de dividir la suma entre 10
+  const modulo = suma % 10;
+
+  // Si el residuo es 0, el dígito debe ser 0. Si no, restar de 10
+  const digitoCalculado = modulo === 0 ? 0 : 10 - modulo;
+
+  // Comparar el dígito calculado con el verificador original
+  return digitoCalculado === digitoVerificador;
+}
